@@ -38,3 +38,7 @@ MIT
 [_单击_](https://applink.feishu.cn/client/chat/chatter/add_by_link?link_token=575k28fa-2c12-400a-80c0-2d8924e00d38)或扫码加入讨论群
 
 <img src="doc/qrcode.png" width="200" alt="讨论群">
+
+
+## fork修改
+为websocket添加了使用http代理支持，通过具体协议类型自动读取http_proxy或https_proxy环境变量

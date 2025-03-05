@@ -3,10 +3,12 @@ import base64
 import http
 import random
 import time
+import os
 from urllib.parse import urlparse, parse_qs
 
 import requests
 import websockets
+from websockets_proxy import Proxy, proxy_connect
 
 from lark_oapi.core.cache import ExpiringCache
 from lark_oapi.core.const import UTF_8, FEISHU_DOMAIN
@@ -149,7 +151,17 @@ class Client(object):
             conn_id = q[DEVICE_ID][0]
             service_id = q[SERVICE_ID][0]
 
-            conn = await websockets.connect(conn_url)
+            if u.scheme == "wss":
+                proxy_url = os.getenv('HTTPS_PROXY')
+            else:
+                proxy_url = os.getenv('HTTP_PROXY')
+
+            if proxy_url:
+                proxy = Proxy.from_url(proxy_url)
+                conn = await proxy_connect(conn_url, proxy=proxy)
+            else:
+                conn = await websockets.connect(conn_url)
+
             self._conn = conn
             self._conn_url = conn_url
             self._conn_id = conn_id
