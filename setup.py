@@ -9,7 +9,7 @@ with open("README.md", mode="r", encoding=UTF_8) as f:
 
 setup(
     name="lark-oapi-proxy",
-    version=VERSION,
+    version=VERSION + ".2",
     description="Lark OpenAPI SDK for Python with Proxy Support",
     long_description=readme,
     long_description_content_type="text/markdown",

@@ -13,7 +13,9 @@ from lark_oapi.core.model import *
 class Transport(object):
 
     @staticmethod
-    def execute(conf: Config, req: BaseRequest, option: Optional[RequestOption] = None) -> RawResponse:
+    def execute(
+        conf: Config, req: BaseRequest, option: Optional[RequestOption] = None
+    ) -> RawResponse:
         if option is None:
             option = RequestOption()
 
@@ -25,7 +27,9 @@ class Transport(object):
 
         data = req.body
         if data is not None and not isinstance(data, MultipartEncoder):
-            data = JSON.marshal(req.body).encode(UTF_8)
+            dump_text = JSON.marshal(req.body)
+            safe_text = dump_text.encode("utf-16", "surrogatepass").decode("utf-16")
+            data = safe_text.encode(UTF_8, "replace")
 
         response = requests.request(
             str(req.http_method.name),
@@ -36,10 +40,12 @@ class Transport(object):
             timeout=conf.timeout,
         )
 
-        logger.debug(f"{str(req.http_method.name)} {url} {response.status_code}, "
-                     f"headers: {JSON.marshal(headers)}, "
-                     f"params: {JSON.marshal(req.queries)}, "
-                     f"body: {str(data, UTF_8) if isinstance(data, bytes) else data}")
+        logger.debug(
+            f"{str(req.http_method.name)} {url} {response.status_code}, "
+            f"headers: {JSON.marshal(headers)}, "
+            f"params: {JSON.marshal(req.queries)}, "
+            f"body: {str(data, UTF_8) if isinstance(data, bytes) else data}"
+        )
 
         resp = RawResponse()
         resp.status_code = response.status_code
@@ -49,7 +55,9 @@ class Transport(object):
         return resp
 
     @staticmethod
-    async def aexecute(conf: Config, req: BaseRequest, option: Optional[RequestOption] = None) -> RawResponse:
+    async def aexecute(
+        conf: Config, req: BaseRequest, option: Optional[RequestOption] = None
+    ) -> RawResponse:
         if option is None:
             option = RequestOption()
 
